@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>ACM Website Launch</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<style>
+:root {
+  --accent: #00b4ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: #000;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Inter", system-ui, sans-serif;
+  overflow: hidden;
+}
+
+.wrapper {
+  text-align: center;
+}
+
+/* Countdown Circle */
+.circle {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background:
+    conic-gradient(var(--accent) 0deg, rgba(255,255,255,0.08) 0deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  transition: background 1s linear;
+}
+
+.circle::after {
+  content: "";
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  background: #000;
+  border-radius: 50%;
+}
+
+/* Number */
+.number {
+  position: relative;
+  font-size: 4.5rem;
+  font-weight: 700;
+  z-index: 2;
+  color: var(--accent);
+}
+
+/* Status Text */
+.status {
+  margin-top: 30px;
+  font-size: 0.95rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  min-height: 20px;
+}
+
+/* Flash */
+.flash {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+  <div id="circle" class="circle">
+    <div id="number" class="number">5</div>
+  </div>
+  <div id="status" class="status">Initializing system</div>
+</div>
+
+<div id="flash" class="flash"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+let time = 5;
+
+const numberEl = document.getElementById("number");
+const statusEl = document.getElementById("status");
+const circleEl = document.getElementById("circle");
+const flashEl = document.getElementById("flash");
+
+const messages = {
+  5: "Initializing system",
+  4: "Loading modules",
+  3: "Connecting community",
+  2: "Final checks",
+  1: "Ready to launch"
+};
+
+function update() {
+  numberEl.textContent = time;
+  statusEl.textContent = messages[time];
+
+  const progress = ((5 - time + 1) / 5) * 360;
+  circleEl.style.background =
+    `conic-gradient(var(--accent) ${progress}deg, rgba(255,255,255,0.08) ${progress}deg)`;
+
+  if (time === 0) {
+    launch();
+    return;
+  }
+
+  time--;
+  setTimeout(update, 1000);
+}
+
+function launch() {
+  // Flash
+  flashEl.style.opacity = "1";
+  setTimeout(() => flashEl.style.opacity = "0", 120);
+
+  // Confetti
+  confetti({
+    particleCount: 220,
+    spread: 100,
+    startVelocity: 45,
+    origin: { y: 0.6 }
+  });
+
+  setTimeout(() => {
+    window.location.href = "https://soaacm.in/";
+  }, 1800);
+}
+
+update();
+</script>
+
+</body>
+</html>
