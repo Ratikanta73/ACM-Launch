@@ -72,6 +72,26 @@ body {
   min-height: 20px;
 }
 
+/* Center Live Text */
+.live-text {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.live-text.show {
+  opacity: 1;
+}
+
 /* Launch Button */
 .launch-btn {
   margin-top: 30px;
@@ -104,7 +124,7 @@ body {
 
 <body>
 
-<div class="wrapper">
+<div id="wrapper" class="wrapper">
   <div id="circle" class="circle">
     <div id="number" class="number">5</div>
   </div>
@@ -114,7 +134,14 @@ body {
   <button id="launchBtn" class="launch-btn">Launch</button>
 </div>
 
+<!-- Live Text -->
+<div id="liveText" class="live-text">WE ARE NOW LIVE</div>
+
 <div id="flash" class="flash"></div>
+
+<!-- 🔊 Audio -->
+<audio id="countSound" src="countdown.mp3" preload="auto"></audio>
+<audio id="confettiSound" src="confetti.mp3" preload="auto"></audio>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -122,11 +149,19 @@ body {
 let time = 5;
 let started = false;
 
+const wrapperEl = document.getElementById("wrapper");
 const numberEl = document.getElementById("number");
 const statusEl = document.getElementById("status");
 const circleEl = document.getElementById("circle");
+const liveTextEl = document.getElementById("liveText");
 const flashEl = document.getElementById("flash");
 const launchBtn = document.getElementById("launchBtn");
+
+const countSound = document.getElementById("countSound");
+const confettiSound = document.getElementById("confettiSound");
+
+countSound.volume = 0.15;
+confettiSound.volume = 0.5;
 
 const messages = {
   5: "Initializing system",
@@ -146,12 +181,21 @@ function update() {
   numberEl.textContent = time;
   statusEl.textContent = messages[time];
 
+  if (time > 0) {
+    countSound.currentTime = 0;
+    countSound.play();
+    setTimeout(() => countSound.pause(), 120);
+  }
+
   const progress = ((5 - time + 1) / 5) * 360;
   circleEl.style.background =
     `conic-gradient(var(--accent) ${progress}deg, rgba(255,255,255,0.08) ${progress}deg)`;
 
-  if (time === 0) {
-    launch();
+  if (time === 1) {
+    // wait 1s showing "1", then transition
+    setTimeout(() => {
+      hideCountdownAndGoLive();
+    }, 1000);
     return;
   }
 
@@ -159,20 +203,33 @@ function update() {
   setTimeout(update, 1000);
 }
 
+function hideCountdownAndGoLive() {
+  /* 🔥 NOW remove countdown completely */
+  wrapperEl.style.display = "none";
+
+  /* Show live text */
+  liveTextEl.classList.add("show");
+
+  launch();
+}
+
 function launch() {
+  confettiSound.currentTime = 0;
+  confettiSound.play();
+
   flashEl.style.opacity = "1";
   setTimeout(() => flashEl.style.opacity = "0", 120);
 
   confetti({
-    particleCount: 220,
-    spread: 100,
-    startVelocity: 45,
+    particleCount: 300,
+    spread: 130,
+    startVelocity: 55,
     origin: { y: 0.6 }
   });
 
   setTimeout(() => {
     window.location.href = "https://soaacm.in/";
-  }, 1800);
+  }, 2500);
 }
 
 launchBtn.addEventListener("click", () => {
