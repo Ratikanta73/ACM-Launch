@@ -36,8 +36,7 @@ body {
   width: 220px;
   height: 220px;
   border-radius: 50%;
-  background:
-    conic-gradient(var(--accent) 0deg, rgba(255,255,255,0.08) 0deg);
+  background: conic-gradient(var(--accent) 0deg, rgba(255,255,255,0.08) 0deg);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -73,6 +72,25 @@ body {
   min-height: 20px;
 }
 
+/* Launch Button */
+.launch-btn {
+  margin-top: 30px;
+  padding: 12px 34px;
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.launch-btn:hover {
+  background: var(--accent);
+  color: #000;
+}
+
 /* Flash */
 .flash {
   position: fixed;
@@ -90,7 +108,10 @@ body {
   <div id="circle" class="circle">
     <div id="number" class="number">5</div>
   </div>
-  <div id="status" class="status">Initializing system</div>
+
+  <div id="status" class="status">Awaiting launch</div>
+
+  <button id="launchBtn" class="launch-btn">Launch</button>
 </div>
 
 <div id="flash" class="flash"></div>
@@ -99,11 +120,13 @@ body {
 
 <script>
 let time = 5;
+let started = false;
 
 const numberEl = document.getElementById("number");
 const statusEl = document.getElementById("status");
 const circleEl = document.getElementById("circle");
 const flashEl = document.getElementById("flash");
+const launchBtn = document.getElementById("launchBtn");
 
 const messages = {
   5: "Initializing system",
@@ -112,6 +135,12 @@ const messages = {
   2: "Final checks",
   1: "Ready to launch"
 };
+
+/* prevent going back */
+history.pushState(null, "", location.href);
+window.addEventListener("popstate", () => {
+  location.replace(location.href);
+});
 
 function update() {
   numberEl.textContent = time;
@@ -131,11 +160,9 @@ function update() {
 }
 
 function launch() {
-  // Flash
   flashEl.style.opacity = "1";
   setTimeout(() => flashEl.style.opacity = "0", 120);
 
-  // Confetti
   confetti({
     particleCount: 220,
     spread: 100,
@@ -148,7 +175,12 @@ function launch() {
   }, 1800);
 }
 
-update();
+launchBtn.addEventListener("click", () => {
+  if (started) return;
+  started = true;
+  launchBtn.style.display = "none";
+  update();
+});
 </script>
 
 </body>
